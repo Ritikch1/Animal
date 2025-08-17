@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Animal Scratch Messages</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        /* General Body & Layout Styles */
+        html {
+            height: 100%;
+        }
+        body {
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100%;
+            background: #fdfaf7;
+            font-family: 'Poppins', sans-serif;
+            flex-direction: column;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        h1 {
+            color: #4a4a4a;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        /* Responsive Button Container */
+        .button-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 20px;
+            width: 100%;
+            max-width: 700px;
+            margin-bottom: 80px; /* Extra space for the fixed footer */
+        }
+
+        /* Touch-friendly Sticker Buttons */
+        .sticker-btn {
+            background: #fff;
+            border-radius: 20px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
+            padding: 20px;
+            cursor: pointer;
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease;
+            text-align: center;
+        }
+        .sticker-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 25px rgba(0, 0, 0, 0.12);
+        }
+        .sticker-btn:active {
+            transform: scale(0.97);
+        }
+        .sticker-btn svg {
+            width: 100px;
+            height: 100px;
+            display: block;
+            margin: 0 auto;
+            pointer-events: none; /* Prevents SVG from interfering with clicks */
+        }
+
+        /* Adaptive Popup */
+        .popup {
+            position: fixed;
+            inset: 0;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+            z-index: 1000;
+            padding: 15px;
+        }
+        .popup-content {
+            background: #fff;
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            position: relative;
+            width: 100%;
+            max-width: 340px;
+        }
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 28px;
+            color: #aaa;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+        .close-btn:hover {
+            color: #333;
+        }
+
+        /* Scratch Area */
+        .scratch-container {
+            position: relative;
+            margin-top: 15px;
+            width: 100%;
+            aspect-ratio: 2 / 1;
+            border-radius: 15px;
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+        }
+        .scratch-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            cursor: crosshair;
+            z-index: 2;
+        }
+        .hidden-message {
+            position: absolute;
+            inset: 0;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            font-size: clamp(1rem, 5vw, 1.25rem); /* Responsive font size */
+            font-weight: 600;
+            color: #5a5a5a;
+            z-index: 1;
+            pointer-events: none;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+        .final-reveal {
+            font-size: clamp(0.9rem, 4.5vw, 1.1rem);
+            font-style: italic;
+        }
+        
+        /* Footer Styling */
+        footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 25px;
+            box-sizing: border-box;
+            color: #a0a0a0;
+            font-size: 0.9rem;
+            pointer-events: none; /* Makes sure it doesn't interfere with clicks */
+        }
+    </style>
+</head>
+<body>
+    <h1>A Secret Message For You!</h1>
+    <div class="button-container">
+        <div class="sticker-btn" data-id="cat">
+            <svg viewBox="0 0 100 100" fill="none">
+                <ellipse cx="50" cy="70" rx="30" ry="20" fill="#222"/>
+                <circle cx="50" cy="60" r="24" fill="#222"/>
+                <ellipse cx="33" cy="63" rx="4" ry="7" fill="#fff"/>
+                <ellipse cx="67" cy="63" rx="4" ry="7" fill="#fff"/>
+                <circle cx="42" cy="65" r="3" fill="#fff"/>
+                <circle cx="58" cy="65" r="3" fill="#fff"/>
+                <ellipse cx="50" cy="59" rx="2" ry="1" fill="#fff"/>
+                <rect x="24" y="69" width="12" height="1.5" rx="0.75" fill="#fff"/>
+                <rect x="64" y="69" width="12" height="1.5" rx="0.75" fill="#fff"/>
+                <polygon points="32,47 23,23 42,38" fill="#222"/>
+                <polygon points="68,47 77,23 58,38" fill="#222"/>
+            </svg>
+        </div>
+        <div class="sticker-btn" data-id="cow">
+            <svg viewBox="0 0 100 100" fill="none">
+                <ellipse cx="50" cy="70" rx="28" ry="18" fill="#fff2de"/>
+                <ellipse cx="50" cy="60" rx="22" ry="19" fill="#fff2de"/>
+                <ellipse cx="65" cy="67" rx="3" ry="4" fill="#7d502a"/>
+                <ellipse cx="35" cy="67" rx="3" ry="4" fill="#7d502a"/>
+                <circle cx="45" cy="65" r="2.5" fill="#222"/>
+                <circle cx="55" cy="65" r="2.5" fill="#222"/>
+                <ellipse cx="50" cy="76" rx="7" ry="4" fill="#ffc8a2"/>
+                <ellipse cx="37" cy="48" rx="6" ry="3" fill="#b4a597"/>
+                <ellipse cx="63" cy="48" rx="6" ry="3" fill="#b4a597"/>
+                <ellipse cx="31" cy="58" rx="6" ry="3.2" fill="#7d502a"/>
+                <ellipse cx="69" cy="58" rx="6" ry="3.2" fill="#7d502a"/>
+            </svg>
+        </div>
+        <div class="sticker-btn" data-id="goat">
+            <svg viewBox="0 0 100 100" fill="none">
+                <ellipse cx="50" cy="70" rx="26" ry="17" fill="#ebe0ce"/>
+                <ellipse cx="50" cy="57" rx="16" ry="13" fill="#ede9e2"/>
+                <ellipse cx="50" cy="65" rx="11" ry="7" fill="#fff"/>
+                <circle cx="44" cy="65" r="2" fill="#222"/>
+                <circle cx="56" cy="65" r="2" fill="#222"/>
+                <path d="M46 71 Q50 75 54 71" stroke="#222" stroke-width="1.2" fill="none"/>
+                <path d="M36 45 Q30 38 38 35" stroke="#b3a28f" stroke-width="2" fill="none"/>
+                <path d="M64 45 Q70 38 62 35" stroke="#b3a28f" stroke-width="2" fill="none"/>
+                <ellipse cx="34" cy="57" rx="6" ry="2" fill="#d4c3ac"/>
+                <ellipse cx="66" cy="57" rx="6" ry="2" fill="#d4c3ac"/>
+            </svg>
+        </div>
+        <div class="sticker-btn" data-id="rabbit">
+             <svg viewBox="0 0 100 100" fill="none">
+                <ellipse cx="50" cy="73" rx="26" ry="18" fill="#c49148"/>
+                <ellipse cx="50" cy="58" rx="19" ry="16" fill="#ffe7b3"/>
+                <ellipse cx="40" cy="62" rx="4" ry="5" fill="#fff"/>
+                <ellipse cx="60" cy="62" rx="4" ry="5" fill="#fff"/>
+                <ellipse cx="50" cy="67" rx="6" ry="3" fill="#fff"/>
+                <circle cx="45" cy="65" r="2" fill="#222"/>
+                <circle cx="55" cy="65" r="2" fill="#222"/>
+                <polygon points="50,69 48,72 52,72" fill="#dc965a"/>
+                <ellipse cx="32" cy="72" rx="6" ry="3" fill="#c49148"/>
+                <ellipse cx="68" cy="72" rx="6" ry="3" fill="#c49148"/>
+                <ellipse cx="39" cy="49" rx="2.5" ry="6" fill="#c49148" transform="rotate(-28 39 49)"/>
+                <ellipse cx="61" cy="49" rx="2.5" ry="6" fill="#c49148" transform="rotate(28 61 49)"/>
+            </svg>
+        </div>
+    </div>
+
+    <!-- A single, reusable popup -->
+    <div class="popup" id="mainPopup">
+        <div class="popup-content">
+            <span class="close-btn">&times;</span>
+            <h2 id="popupTitle"></h2>
+            <div class="scratch-container">
+                <canvas class="scratch-canvas" id="mainCanvas" width="300" height="150"></canvas>
+                <div class="hidden-message" id="popupTeaser1"></div>
+                <div class="hidden-message" id="popupTeaser2"></div>
+                <div class="hidden-message final-reveal" id="popupFinalMessage"></div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Footer -->
+    <footer>
+        <span>socha hai, ho jayega</span>
+        <span>~ Quietude</span>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            // --- CENTRALIZED DATA ---
+            // All information for each animal is stored here.
+            const animalData = {
+                'cat': {
+                    title: 'A Cat\'s Secret...',
+                    messages: ['scratch here...', 'almost there...', '✨ The quietest purr holds the loudest love. ✨']
+                },
+                'cow': {
+                    title: 'A Note from the Pasture!',
+                    messages: ['moo-ve closer...', 'keep going...', '💖 You make the world a brighter place! 💖']
+                },
+                'goat': {
+                    title: 'A Flattering Thought!',
+                    messages: ['just a peek...', 'you won\'t believe...', '🐐 If Rapunzel had seen your hair, she would’ve been jealous. 🐐']
+                },
+                'rabbit': {
+                    title: 'A Sweet Observation!',
+                    messages: ['look closer...', 'it\'s about you...', '🐇 Your eyes don’t just see the world; they make it more beautiful for everyone else. 🐇']
+                }
+            };
+
+            // --- GET ELEMENTS ---
+            const mainPopup = document.getElementById('mainPopup');
+            const closeBtn = mainPopup.querySelector('.close-btn');
+            const mainCanvas = document.getElementById('mainCanvas');
+            const stickerButtons = document.querySelectorAll('.sticker-btn');
+            
+            const popupTitle = document.getElementById('popupTitle');
+            const teaser1 = document.getElementById('popupTeaser1');
+            const teaser2 = document.getElementById('popupTeaser2');
+            const finalMessage = document.getElementById('popupFinalMessage');
+
+            let isDrawing = false;
+            let currentAnimalId = null;
+
+            // --- SETUP EVENT LISTENERS ---
+
+            // Open popup when a sticker is clicked
+            stickerButtons.forEach(button => {
+                button.onclick = () => {
+                    currentAnimalId = button.dataset.id;
+                    const data = animalData[currentAnimalId];
+                    if (data) {
+                        popupTitle.textContent = data.title;
+                        teaser1.textContent = data.messages[0];
+                        teaser2.textContent = data.messages[1];
+                        finalMessage.textContent = data.messages[2];
+                    }
+                    mainPopup.style.display = 'flex';
+                    resetCanvas();
+                };
+            });
+
+            // Close popup logic
+            closeBtn.onclick = () => mainPopup.style.display = 'none';
+            mainPopup.onclick = (e) => {
+                if (e.target === mainPopup) {
+                    mainPopup.style.display = 'none';
+                }
+            };
+
+            // --- SCRATCHING LOGIC ---
+
+            const getPointerPosition = (e) => {
+                const rect = mainCanvas.getBoundingClientRect();
+                const touch = e.touches ? e.touches[0] : e;
+                // Scale mouse/touch coordinates to match the canvas's internal resolution
+                const x = (touch.clientX - rect.left) * (mainCanvas.width / rect.width);
+                const y = (touch.clientY - rect.top) * (mainCanvas.height / rect.height);
+                return { x, y };
+            };
+
+            const startDrawing = (e) => {
+                isDrawing = true;
+                handleScratch(e); // Allows a "dot" on the first click/touch
+            };
+
+            const stopDrawing = () => {
+                isDrawing = false;
+                mainCanvas.getContext('2d').beginPath(); // Reset the drawing path
+            };
+
+            const handleScratch = (e) => {
+                if (!isDrawing) return;
+                e.preventDefault(); // Prevents page scrolling on touch devices
+
+                const pos = getPointerPosition(e);
+                const ctx = mainCanvas.getContext('2d');
+                
+                ctx.globalCompositeOperation = 'destination-out';
+                ctx.lineWidth = 40; // Makes the scratch line thicker
+                ctx.lineCap = 'round';
+                ctx.lineJoin = 'round';
+                
+                ctx.lineTo(pos.x, pos.y);
+                ctx.stroke();
+                
+                ctx.beginPath();
+                ctx.moveTo(pos.x, pos.y);
+                
+                checkScratchProgress();
+            };
+            
+            // Attach listeners to the single canvas
+            mainCanvas.addEventListener('mousedown', startDrawing);
+            mainCanvas.addEventListener('mousemove', handleScratch);
+            mainCanvas.addEventListener('mouseup', stopDrawing);
+            mainCanvas.addEventListener('mouseleave', stopDrawing);
+            mainCanvas.addEventListener('touchstart', startDrawing, { passive: false });
+            mainCanvas.addEventListener('touchmove', handleScratch, { passive: false });
+            mainCanvas.addEventListener('touchend', stopDrawing);
+
+            // --- UTILITY FUNCTIONS ---
+
+            function resetCanvas() {
+                // Hide all messages
+                [teaser1, teaser2, finalMessage].forEach(msg => msg.style.display = 'none');
+                
+                // Redraw the scratchable overlay
+                const ctx = mainCanvas.getContext('2d');
+                ctx.globalCompositeOperation = 'source-over';
+                ctx.fillStyle = '#c2c2c2';
+                ctx.fillRect(0, 0, mainCanvas.width, mainCanvas.height);
+            }
+
+            function checkScratchProgress() {
+                const ctx = mainCanvas.getContext('2d');
+                // Get pixel data from the canvas
+                const pixels = ctx.getImageData(0, 0, mainCanvas.width, mainCanvas.height).data;
+                const totalPixels = mainCanvas.width * mainCanvas.height;
+                let clearedPixels = 0;
+
+                // Count how many pixels have been cleared (alpha channel is 0)
+                // We only check every 4th byte (the alpha channel) for efficiency
+                for (let i = 3; i < pixels.length; i += 4) {
+                    if (pixels[i] === 0) {
+                        clearedPixels++;
+                    }
+                }
+
+                const clearedPercentage = clearedPixels / totalPixels;
+
+                // Reveal messages based on how much has been scratched
+                if (clearedPercentage > 0.6) {
+                    teaser2.style.display = 'none';
+                    finalMessage.style.display = 'flex';
+                } else if (clearedPercentage > 0.3) {
+                    teaser1.style.display = 'none';
+                    teaser2.style.display = 'flex';
+                } else if (clearedPercentage > 0.1) {
+                    teaser1.style.display = 'flex';
+                }
+            }
+        });
+    </script>
+</body>
+</html>
